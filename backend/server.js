@@ -123,6 +123,6 @@ app.post('/api/customer/apply-loan', authenticateToken, (req, res) => {
 
 // ====================== START SERVER ======================
 app.listen(PORT, () => {
-  console.log(`✅ PesoLoan Backend running on http://localhost:${PORT}`);
+  console.log(`✅ PesoLoan Backend running on https://pesoloan-backend.onrender.com`);
   console.log(`📂 Frontend served from: ${path.join(__dirname, '../frontend')}`);
 });
