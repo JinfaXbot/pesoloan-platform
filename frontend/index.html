@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PesoLoan — Fast, Trusted Loans</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1240a0;
+    --success: #0e9f6e;
+    --gray-50: #f9fafb;
+    --gray-900: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--gray-50); color: #111827; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  /* Navigation */
+  nav {
+    background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 28px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a56db, #1240a0); color: white; padding: 100px 20px; text-align: center;
+  }
+  .hero h1 { font-size: 48px; margin-bottom: 16px; }
+  .hero p { font-size: 20px; max-width: 600px; margin: 0 auto 32px; opacity: 0.95; }
+
+  /* Auth Card */
+  .auth-card {
+    background: white; max-width: 420px; margin: 40px auto; padding: 40px; border-radius: 16px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; color: #374151; }
+  input { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; }
+  input:focus { outline: none; border-color: var(--primary); }
+
+  button {
+    width: 100%; padding: 14px; font-size: 16px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">₱ PesoLoan</div>
+  <div>
+    <button onclick="showAuth('login')" class="btn-outline" style="margin-right:10px;">Sign In</button>
+    <button onclick="showAuth('register')" class="btn-primary">Get Started</button>
+    <button onclick="showAdminLogin()" style="margin-left:12px;background:#374151;color:white;">Admin</button>
+  </div>
+</nav>
+
+<!-- HERO / LANDING -->
+<div class="hero" id="landing-page">
+  <div class="container">
+    <h1>Fast Loans,<br>Trusted Results</h1>
+    <p>Borrow from ₱80,000 to ₱5,000,000 with low interest and fast approval.</p>
+    <button onclick="showAuth('register')" class="btn-primary" style="font-size:18px;padding:16px 32px;">Apply Now — Free</button>
+  </div>
+</div>
+
+<!-- CUSTOMER LOGIN -->
+<div class="auth-card hidden" id="login-page">
+  <h2 style="text-align:center;margin-bottom:8px;">Welcome Back</h2>
+  <p style="text-align:center;color:#6b7280;margin-bottom:30px;">Sign in to your account</p>
+  
+  <div class="form-group">
+    <label>Phone Number</label>
+    <input type="tel" id="login-phone" placeholder="09XXXXXXXXX">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="login-password" placeholder="••••••••">
+  </div>
+  <button onclick="customerLogin()" class="btn-primary">Sign In</button>
+  <p style="text-align:center;margin-top:20px;">
+    Don't have an account? <a href="#" onclick="showAuth('register')">Register</a>
+  </p>
+</div>
+
+<!-- CUSTOMER REGISTER -->
+<div class="auth-card hidden" id="register-page">
+  <h2 style="text-align:center;margin-bottom:8px;">Create Account</h2>
+  <p style="text-align:center;color:#6b7280;margin-bottom:30px;">Start your loan journey today</p>
+  
+  <div class="form-group">
+    <label>Phone Number</label>
+    <input type="tel" id="reg-phone" placeholder="09XXXXXXXXX">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="reg-password" placeholder="Create password">
+  </div>
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" id="reg-password2" placeholder="Confirm password">
+  </div>
+  <button onclick="customerRegister()" class="btn-primary">Create Account</button>
+  <p style="text-align:center;margin-top:20px;">
+    Already have an account? <a href="#" onclick="showAuth('login')">Sign In</a>
+  </p>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="auth-card hidden" id="admin-login-page">
+  <h2 style="text-align:center;margin-bottom:8px;">Admin Portal</h2>
+  <p style="text-align:center;color:#6b7280;margin-bottom:30px;">Authorized Personnel Only</p>
+  
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" id="admin-user" value="admin">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="admin-pass" value="admin123">
+  </div>
+  <button onclick="adminLogin()" class="btn-primary">Sign In as Admin</button>
+</div>
+
+<script>
+// API Base URL
+const API = 'http://localhost:3000/api';
+
+// Show specific auth page
+function showAuth(page) {
+  document.getElementById('landing-page').classList.add('hidden');
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('register-page').classList.add('hidden');
+  document.getElementById('admin-login-page').classList.add('hidden');
+
+  if (page === 'login') document.getElementById('login-page').classList.remove('hidden');
+  if (page === 'register') document.getElementById('register-page').classList.remove('hidden');
+}
+
+function showAdminLogin() {
+  document.getElementById('landing-page').classList.add('hidden');
+  document.getElementById('admin-login-page').classList.remove('hidden');
+}
+
+// Customer Register
+async function customerRegister() {
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const pass2 = document.getElementById('reg-password2').value;
+
+  if (!phone || pass.length < 6 || pass !== pass2) {
+    return alert('Please check your inputs');
+  }
+
+  const res = await fetch(`${API}/customer/register`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({phone, password: pass})
+  });
+
+  const data = await res.json();
+  if (data.message) {
+    alert('Account created successfully! Please sign in.');
+    showAuth('login');
+  } else {
+    alert(data.error || 'Registration failed');
+  }
+}
+
+// Customer Login
+async function customerLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  const res = await fetch(`${API}/customer/login`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({phone, password})
+  });
+
+  const data = await res.json();
+  if (data.token) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userType', 'customer');
+    window.location.href = 'customer.html';
+  } else {
+    alert(data.error || 'Login failed');
+  }
+}
+
+// Admin Login
+async function adminLogin() {
+  const username = document.getElementById('admin-user').value;
+  const password = document.getElementById('admin-pass').value;
+
+  const res = await fetch(`${API}/admin/login`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, password})
+  });
+
+  const data = await res.json();
+  if (data.token) {
+    localStorage.setItem('adminToken', data.token);
+    localStorage.setItem('userType', 'admin');
+    window.location.href = 'admin.html';
+  } else {
+    alert('Invalid admin credentials');
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PesoLoan - Customer Dashboard</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1240a0;
+    --success: #0e9f6e;
+    --danger: #e02424;
+    --warning: #c27803;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --radius: 12px;
+    --shadow: 0 4px 6px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); padding-bottom: 90px; }
+  .hidden { display: none !important; }
+
+  .top-nav {
+    background: white; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; color: var(--primary); }
+  .logo-icon { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 20px; }
+
+  .card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--gray-200); margin-bottom: 24px; overflow: hidden; }
+  .card-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); font-weight: 700; font-size: 18px; }
+  .card-body { padding: 24px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-success { background: var(--success); color: white; }
+  .btn-ghost { background: transparent; color: var(--gray-700); border: 2px solid var(--gray-200); }
+  .btn-full { width: 100%; }
+  .btn-danger { background: var(--danger); color: white; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--gray-700); }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 15px; }
+  .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); }
+
+  .wallet-hero { background: linear-gradient(135deg, #059669, #047857); color: white; padding: 32px; border-radius: var(--radius); margin-bottom: 24px; }
+  .wallet-balance { font-size: 42px; font-weight: 900; margin: 8px 0; }
+
+  .info-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--gray-100); }
+  .info-label { color: var(--gray-700); font-weight: 500; }
+  .info-value { font-weight: 600; }
+
+  .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+
+  .step-indicator { display: flex; gap: 8px; margin-bottom: 24px; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #9ca3af; }
+  .step.active { color: var(--primary); }
+  .step.done { color: var(--success); }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white;
+    border-top: 1px solid var(--gray-200); display: flex; justify-content: space-around;
+    padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 200;
+  }
+  .bottom-nav button {
+    flex: 1; background: none; border: none; padding: 8px 0; font-size: 13px; font-weight: 600;
+    color: var(--gray-700); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .bottom-nav button.active { color: var(--primary); }
+  .bottom-nav button .icon { font-size: 22px; }
+</style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<nav class="top-nav">
+  <div class="logo">
+    <div class="logo-icon">₱</div>
+    PesoLoan
+  </div>
+  <div style="color:#6b7280; font-size:14px;">Customer</div>
+</nav>
+
+<div class="container">
+
+  <!-- HOME TAB -->
+  <div id="tab-home">
+    <div class="card" style="background: linear-gradient(135deg, #1a56db, #1240a0); color: white; padding: 32px;">
+      <h2 id="greeting" style="font-size: 28px; margin-bottom: 8px;">Good day!</h2>
+      <p style="opacity: 0.9; margin-bottom: 24px;">Ready to apply for a loan? Get funds fast.</p>
+      <button class="btn" style="background: white; color: var(--primary); font-weight: 700;" onclick="showApplyForm()">
+        Apply for Loan →
+      </button>
+    </div>
+
+    <div id="loan-status-card" class="card hidden">
+      <div class="card-header">Your Loan Application</div>
+      <div class="card-body">
+        <div class="info-row"><span class="info-label">Status</span><span id="loan-status"></span></div>
+        <div class="info-row"><span class="info-label">Amount</span><span id="loan-amount" class="info-value"></span></div>
+        <div class="info-row"><span class="info-label">Term</span><span id="loan-term" class="info-value"></span></div>
+        <div class="info-row"><span class="info-label">Monthly Payment</span><span id="loan-monthly" class="info-value"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLY FORM -->
+  <div id="apply-form" class="hidden">
+    <div class="card">
+      <div class="card-header" style="display:flex; align-items:center; gap:12px;">
+        <button class="btn btn-ghost" onclick="hideApplyForm()" style="padding:8px 12px;">← Back</button>
+        <h3 style="margin:0;">Loan Application</h3>
+      </div>
+      <div class="card-body">
+
+        <div class="step-indicator">
+          <div class="step active" id="step1"><div class="step-num">1</div> Details</div>
+          <div class="step" id="step2"><div class="step-num">2</div> Personal</div>
+          <div class="step" id="step3"><div class="step-num">3</div> Bank</div>
+        </div>
+
+        <!-- Step 1: Loan Details -->
+        <div id="apply-step-1">
+          <div class="form-group">
+            <label class="form-label">Loan Amount (₱)</label>
+            <input type="number" class="form-input" id="apply-amount" placeholder="e.g. 150000" min="80000" max="5000000" step="1000"
+                   oninput="updateMonthlyPreview()">
+            <div style="font-size:12px; color:#6b7280; margin-top:4px;">Minimum ₱80,000 • Maximum ₱5,000,000</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Loan Term (months)</label>
+            <input type="number" class="form-input" id="apply-term" placeholder="e.g. 12" min="6" max="36"
+                   oninput="updateMonthlyPreview()">
+          </div>
+
+          <!-- Live Calculator Preview -->
+          <div id="monthly-preview" style="display:none; background:#e8f0fe; border-radius:12px; padding:20px; margin-top:8px;">
+            <div style="font-size:13px; color:#374151; margin-bottom:4px;">Monthly Payment</div>
+            <div style="font-size:32px; font-weight:900; color:#1a56db;" id="monthly-amount">—</div>
+            <div style="margin-top:12px; font-size:14px; color:#374151;">
+              Total Repayment: <strong id="total-repay">—</strong><br>
+              Total Interest: <strong id="total-interest">—</strong>
+            </div>
+            <div style="font-size:12px; color:#6b7280; margin-top:8px;">Interest rate: 0.5% per month</div>
+          </div>
+
+          <button class="btn btn-primary btn-full" onclick="goToStep(2)" style="margin-top:16px;">Continue →</button>
+        </div>
+
+        <!-- Step 2: Personal Info -->
+        <div id="apply-step-2" class="hidden">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="apply-name">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select class="form-select" id="apply-gender">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" class="form-input" id="apply-dob">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Occupation / Job</label>
+            <input type="text" class="form-input" id="apply-job">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily Income (₱)</label>
+            <input type="number" class="form-input" id="apply-income">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Complete Address</label>
+            <textarea class="form-textarea" id="apply-address" rows="3"></textarea>
+          </div>
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <button class="btn btn-ghost" onclick="goToStep(1)" style="flex:1;">← Back</button>
+            <button class="btn btn-primary" onclick="goToStep(3)" style="flex:1;">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Bank Details -->
+        <div id="apply-step-3" class="hidden">
+          <div class="form-group">
+            <label class="form-label">Bank Name</label>
+            <input type="text" class="form-input" id="apply-bank" placeholder="e.g. BPI, BDO, Metrobank, GCash, Maya">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Name</label>
+            <input type="text" class="form-input" id="apply-bank-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Number</label>
+            <input type="text" class="form-input" id="apply-bank-no">
+          </div>
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <button class="btn btn-ghost" onclick="goToStep(2)" style="flex:1;">← Back</button>
+            <button class="btn btn-success btn-full" onclick="submitApplication()">Submit Application</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET TAB -->
+  <div id="tab-wallet" class="hidden">
+    <div class="wallet-hero">
+      <div style="font-size:14px; opacity:0.85;">Available Balance</div>
+      <div class="wallet-balance" id="wallet-balance">₱0.00</div>
+      <button class="btn" style="background:rgba(255,255,255,0.2); color:white; margin-top:12px;" onclick="openWithdrawModal()">
+        💸 Withdraw Funds
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-header">Transaction History</div>
+      <div class="card-body" id="txn-list">
+        <p style="color:#9ca3af; text-align:center; padding:20px;">No transactions yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="hidden">
+    <div class="card">
+      <div class="card-header">Personal Information</div>
+      <div class="card-body" id="profile-info"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Credit Score</div>
+      <div class="card-body">
+        <div style="display:flex; align-items:center; gap:24px;">
+          <div style="width:90px; height:90px; border-radius:50%; background:#dcfce7; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; color:#166534;" id="credit-score">650</div>
+          <div>
+            <div style="font-size:20px; font-weight:700;" id="credit-label">Good</div>
+            <div style="color:#6b7280; font-size:14px;">Your credit score affects future loan eligibility.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sign Out Button -->
+    <div style="margin-top: 20px; text-align: center;">
+      <button class="btn btn-danger btn-full" onclick="logout()" style="max-width: 280px;">
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+  <button onclick="switchTab('home', this)" class="active">
+    <div class="icon">🏠</div>
+    <div>Home</div>
+  </button>
+  <button onclick="switchTab('wallet', this)">
+    <div class="icon">💰</div>
+    <div>Wallet</div>
+  </button>
+  <button onclick="switchTab('profile', this)">
+    <div class="icon">👤</div>
+    <div>Profile</div>
+  </button>
+</div>
+
+<script>
+// ==================== CONFIG ====================
+const API = 'http://localhost:3000/api';
+let currentUser = null;
+
+function getToken() { return localStorage.getItem('token'); }
+function logout() { localStorage.removeItem('token'); window.location.href = 'index.html'; }
+
+// ==================== TAB SWITCHING ====================
+function switchTab(tab, element) {
+  document.querySelectorAll('.bottom-nav button').forEach(el => el.classList.remove('active'));
+  if (element) element.classList.add('active');
+
+  document.getElementById('tab-home').classList.add('hidden');
+  document.getElementById('tab-wallet').classList.add('hidden');
+  document.getElementById('tab-profile').classList.add('hidden');
+
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+
+  if (tab === 'wallet') loadWallet();
+  if (tab === 'profile') loadProfile();
+}
+
+// ==================== LIVE CALCULATOR ====================
+function updateMonthlyPreview() {
+  const amount = parseFloat(document.getElementById('apply-amount').value);
+  const term = parseInt(document.getElementById('apply-term').value);
+  const preview = document.getElementById('monthly-preview');
+
+  if (!amount || !term || amount < 80000 || amount > 5000000) {
+    preview.style.display = 'none';
+    return;
+  }
+
+  const INTEREST_RATE = 0.005;
+  const monthly = Math.round(amount * (1 + INTEREST_RATE * term) / term);
+  const total = monthly * term;
+  const interest = total - amount;
+
+  document.getElementById('monthly-amount').textContent = '₱' + monthly.toLocaleString();
+  document.getElementById('total-repay').textContent = '₱' + total.toLocaleString();
+  document.getElementById('total-interest').textContent = '₱' + interest.toLocaleString();
+
+  preview.style.display = 'block';
+}
+
+// ==================== LOAD DATA ====================
+async function loadDashboard() {
+  const token = getToken();
+  if (!token) { window.location.href = 'index.html'; return; }
+
+  try {
+    const res = await fetch(`${API}/customer/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const user = await res.json();
+    currentUser = user;
+
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greeting').textContent = `${greet}, ${user.name ? user.name.split(' ')[0] : 'there'}!`;
+
+    if (user.loan) {
+      document.getElementById('loan-status-card').classList.remove('hidden');
+      document.getElementById('loan-status').innerHTML = `<span class="badge badge-warning">${user.loan.status}</span>`;
+      document.getElementById('loan-amount').textContent = '₱' + Number(user.loan.amount).toLocaleString();
+      document.getElementById('loan-term').textContent = user.loan.term + ' months';
+    }
+  } catch (e) {
+    alert('Session expired. Please login again.');
+    logout();
+  }
+}
+
+async function loadWallet() {
+  document.getElementById('wallet-balance').textContent = '₱0.00';
+  document.getElementById('txn-list').innerHTML = `<p style="color:#9ca3af; text-align:center; padding:20px;">No transactions yet</p>`;
+}
+
+async function loadProfile() {
+  if (!currentUser) return;
+
+  const container = document.getElementById('profile-info');
+  container.innerHTML = `
+    <div class="info-row"><span class="info-label">Full Name</span><span class="info-value">${currentUser.name || 'Not set'}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${currentUser.phone}</span></div>
+    <div class="info-row"><span class="info-label">Gender</span><span class="info-value">${currentUser.gender || 'Not set'}</span></div>
+    <div class="info-row"><span class="info-label">Occupation</span><span class="info-value">${currentUser.job || 'Not set'}</span></div>
+    <div class="info-row"><span class="info-label">Bank</span><span class="info-value">${currentUser.bankName || 'Not set'}</span></div>
+  `;
+
+  const score = currentUser.creditScore || 650;
+  document.getElementById('credit-score').textContent = score;
+  let label = 'Fair';
+  if (score >= 750) label = 'Excellent';
+  else if (score >= 700) label = 'Good';
+  else if (score >= 600) label = 'Fair';
+  document.getElementById('credit-label').textContent = label;
+}
+
+// ==================== APPLY LOAN ====================
+function showApplyForm() {
+  document.getElementById('tab-home').classList.add('hidden');
+  document.getElementById('apply-form').classList.remove('hidden');
+  goToStep(1);
+}
+
+function hideApplyForm() {
+  document.getElementById('apply-form').classList.add('hidden');
+  document.getElementById('tab-home').classList.remove('hidden');
+}
+
+function goToStep(step) {
+  document.getElementById('apply-step-1').classList.add('hidden');
+  document.getElementById('apply-step-2').classList.add('hidden');
+  document.getElementById('apply-step-3').classList.add('hidden');
+
+  document.getElementById('apply-step-' + step).classList.remove('hidden');
+
+  document.getElementById('step1').className = 'step ' + (step > 1 ? 'done' : step === 1 ? 'active' : '');
+  document.getElementById('step2').className = 'step ' + (step > 2 ? 'done' : step === 2 ? 'active' : '');
+  document.getElementById('step3').className = 'step ' + (step === 3 ? 'active' : '');
+}
+
+async function submitApplication() {
+  const token = getToken();
+
+  const payload = {
+    amount: document.getElementById('apply-amount').value,
+    term: document.getElementById('apply-term').value,
+    name: document.getElementById('apply-name').value,
+    gender: document.getElementById('apply-gender').value,
+    dob: document.getElementById('apply-dob').value,
+    job: document.getElementById('apply-job').value,
+    income: document.getElementById('apply-income').value,
+    address: document.getElementById('apply-address').value,
+    bankName: document.getElementById('apply-bank').value,
+    bankAccountName: document.getElementById('apply-bank-name').value,
+    bankAccountNo: document.getElementById('apply-bank-no').value
+  };
+
+  try {
+    const res = await fetch(`${API}/customer/apply-loan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (data.message) {
+      alert('✅ Application submitted successfully! We will review it within 24 hours.');
+      hideApplyForm();
+      loadDashboard();
+    } else {
+      alert(data.error || 'Failed to submit application');
+    }
+  } catch (e) {
+    alert('Error submitting application. Please try again.');
+  }
+}
+
+function openWithdrawModal() {
+  alert('Withdrawal feature coming soon. Contact support for now.');
+}
+
+// ==================== INIT ====================
+window.onload = function() {
+  loadDashboard();
+  const homeBtn = document.querySelector('.bottom-nav button');
+  if (homeBtn) homeBtn.classList.add('active');
+};
+</script>
+
+</body>
+</html>
